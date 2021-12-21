@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
+from django.contrib.auth import get_user_model
 
 from .forms import RegisterForm
 
@@ -29,3 +30,14 @@ class RegisterView(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+
+def check_username(request):
+    """
+    check if username is available
+    """
+    username = request.POST.get("username")
+    if get_user_model().objects.filter(username=username).exists():
+        return HttpResponse("This username already exists.")
+    else:
+        return HttpResponse("This username is available.")
