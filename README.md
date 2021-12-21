@@ -1,3 +1,3 @@
-# Django Project Template
+# Django Forms HTMX
 
-Django project template
+Django HTMX
