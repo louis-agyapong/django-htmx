@@ -1,12 +1,13 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponse
-from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import FormView
-from django.contrib.auth import get_user_model
+from django.shortcuts import render
 
 from .forms import RegisterForm
+from .models import Film
 
 
 class IndexView(TemplateView):
@@ -32,6 +33,16 @@ class RegisterView(FormView):
         return super().form_valid(form)
 
 
+class FilmList(ListView):
+    template_name = "films.html"
+    model = Film
+    context_object_name = "films"
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.films.all()
+
+
 def check_username(request):
     """
     check if username is available
@@ -41,3 +52,17 @@ def check_username(request):
         return HttpResponse("<div id='username-error' class='error'>This username already exists.</div>")
     else:
         return HttpResponse("<div id='username-error' class='success'>This username is available.</div>")
+
+
+def add_film(request):
+    """
+    add film to user's list
+    """
+    name = request.POST.get("film_name")
+    # create film
+    film = Film.objects.create(name=name)
+    # add film to user's list
+    request.user.films.add(film)
+    films = request.user.films.all()
+    # return template with all the users films
+    return render(request, "partials/film-list.html", {"films": films})
