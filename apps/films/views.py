@@ -66,3 +66,15 @@ def add_film(request):
     films = request.user.films.all()
     # return template with all the users films
     return render(request, "partials/film-list.html", {"films": films})
+
+
+def delete_film(request, pk):
+    """
+    remove film from user's list
+    """
+    # remove the film from the user's list
+    film = Film.objects.get(pk=pk)
+    request.user.films.remove(film)
+    # return template template fragment
+    films = request.user.films.all()
+    return render(request, "partials/film-list.html", {"films": films})
